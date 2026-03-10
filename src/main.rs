@@ -1,17 +1,38 @@
 use core::fmt;
-use std::ops::Mul;
+use std::ops::{Add, Mul};
 
 struct Vec2 {
     x: f64,
     y: f64,
 }
-impl Mul for Vec2 {
+impl Mul<Vec2> for Vec2 {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self::Output {
         Self {
             x: self.x * other.x,
             y: self.y * other.y,
+        }
+    }
+}
+
+impl Mul<f64> for Vec2 {
+    type Output = Self;
+
+    fn mul(self, other: f64) -> Self::Output {
+        Self {
+            x: self.x * other,
+            y: self.y * other,
+        }
+    }
+}
+impl Add for Vec2 {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
         }
     }
 }
@@ -43,6 +64,8 @@ impl Particle {
         // Updates position with verlet integration
         self.position.x += self.velocity.x * dt + self.acceleration.x * (dt * dt * 0.5);
         self.position.y += self.velocity.y * dt + self.acceleration.y * (dt * dt * 0.5);
+        // WIP add support for operator overloading for syntatic sugar
+        //self.position += self.position * dt + self.acceleration * (dt * dt * 0.5);
     }
     fn describe_particle(&self) {
         println!(
