@@ -1,10 +1,12 @@
 use core::fmt;
-use std::ops::{Add, Mul};
+use std::ops::{Add, AddAssign, Mul};
 
+#[derive(Clone, Copy)]
 struct Vec2 {
     x: f64,
     y: f64,
 }
+
 impl Mul<Vec2> for Vec2 {
     type Output = Self;
 
@@ -26,6 +28,16 @@ impl Mul<f64> for Vec2 {
         }
     }
 }
+
+impl AddAssign for Vec2 {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
 impl Add for Vec2 {
     type Output = Self;
 
@@ -55,18 +67,18 @@ struct System {
     dt: f64,
     iters: i64,
 }
+
 struct Particles {
     //Probably create a struct that contains a collection of all particles for easier looping over
     //particle particle interactions
 }
+
 impl Particle {
     fn update_position(&mut self, dt: f64) {
         // Updates position with verlet integration
-        self.position.x += self.velocity.x * dt + self.acceleration.x * (dt * dt * 0.5);
-        self.position.y += self.velocity.y * dt + self.acceleration.y * (dt * dt * 0.5);
-        // WIP add support for operator overloading for syntatic sugar
-        //self.position += self.position * dt + self.acceleration * (dt * dt * 0.5);
+        self.position += self.velocity * dt + self.acceleration * (dt * dt * 0.5);
     }
+
     fn describe_particle(&self) {
         println!(
             "mass: {}, velocity: {}, position: {} acceleration: {}",
