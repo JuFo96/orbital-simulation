@@ -1,5 +1,5 @@
 use core::fmt;
-use std::ops::{Add, AddAssign, Mul};
+use std::ops::{Add, AddAssign, Div, Mul};
 
 #[derive(Clone, Copy)]
 struct Vec2 {
@@ -9,7 +9,6 @@ struct Vec2 {
 
 impl Mul<Vec2> for Vec2 {
     type Output = Self;
-
     fn mul(self, other: Self) -> Self::Output {
         Self {
             x: self.x * other.x,
@@ -18,9 +17,18 @@ impl Mul<Vec2> for Vec2 {
     }
 }
 
+impl Div<f64> for Vec2 {
+    type Output = Self;
+    fn div(self, other: f64) -> Self::Output {
+        Self {
+            x: self.x / other,
+            y: self.y / other,
+        }
+    }
+}
+
 impl Mul<f64> for Vec2 {
     type Output = Self;
-
     fn mul(self, other: f64) -> Self::Output {
         Self {
             x: self.x * other,
@@ -40,7 +48,6 @@ impl AddAssign for Vec2 {
 
 impl Add for Vec2 {
     type Output = Self;
-
     fn add(self, other: Self) -> Self::Output {
         Self {
             x: self.x + other.x,
@@ -74,9 +81,12 @@ struct Particles {
 }
 
 impl Particle {
-    fn update_position(&mut self, dt: f64) {
-        // Updates position with verlet integration
+    fn update(&mut self, dt: f64) {
+        // Updates position with velocity verlet integration
+        let old_acceleration = self.acceleration;
         self.position += self.velocity * dt + self.acceleration * (dt * dt * 0.5);
+        self.acceleration = self.apply_forces();
+        self.velocity += (self.acceleration + old_acceleration) * (dt * 0.5);
     }
 
     fn describe_particle(&self) {
@@ -84,6 +94,12 @@ impl Particle {
             "mass: {}, velocity: {}, position: {} acceleration: {}",
             self.mass, self.position, self.velocity, self.acceleration,
         );
+    }
+
+    fn apply_forces(&self) -> Vec2 {
+        //        let mut forces = Vec2 { x: 0.0, y: 0.0 };
+        let gravity = Vec2 { x: -9.8, y: 0.0 };
+        return gravity / self.mass;
     }
 }
 
@@ -101,7 +117,7 @@ fn main() {
     };
 
     while system.time < 10.0 {
-        sun.update_position(system.dt);
+        sun.update(system.dt);
         if system.iters % 50000 == 0 {
             sun.describe_particle();
         }
