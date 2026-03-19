@@ -85,7 +85,7 @@ impl Particle {
         // Updates position with velocity verlet integration
         let old_acceleration = self.acceleration;
         self.position += self.velocity * dt + self.acceleration * (dt * dt * 0.5);
-        self.acceleration = self.apply_forces();
+        self.acceleration = self.apply_forces() / self.mass;
         self.velocity += (self.acceleration + old_acceleration) * (dt * 0.5);
     }
 
@@ -99,7 +99,7 @@ impl Particle {
     fn apply_forces(&self) -> Vec2 {
         //        let mut forces = Vec2 { x: 0.0, y: 0.0 };
         let gravity = Vec2 { x: -9.8, y: 0.0 };
-        return gravity / self.mass;
+        return gravity;
     }
 }
 
